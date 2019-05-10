@@ -279,6 +279,295 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+                                SSO CONFIGURATION:
+                               =====================
+
+Register the Open edX Instance with Google:
+============================================
+
+1.Obtain credentials to access the Google API. To do this, follow the official Google instructions to go  to the Google Developers Console, create a new project, and enable the Google+ API service.
+
+2.In the Google Developers Console, select API Manager, and then select OAuth Consent Screen.
+
+3.For Product name shown to users enter the name of your Open edX instance (for example, “Example Academy Online”).
+
+4.Select Save.
+
+5.Select the Credentials tab, select Create credentials, and then select OAuth client ID.
+
+    >For Application type, select Web application.
+
+    >Leave the Authorized JavaScript origins field blank.
+ 
+    >For Authorized redirect URIs, enter
+          <Open edX instance domain>/auth/complete/google-oauth2/.
+    
+      For example, for devstack, enter http://localhost:8000/auth/complete/google-oauth2/.
+    
+    >Select Create to finish creating the credentials.
+
+6.After you obtain the credentials, note the client ID and the client secret.
+
+
+
+
+Configure Open edX:
+===================
+
+1. In the lms.env.json file, change the value of FEATURES > "AUTH_USE_OPENID_PROVIDER": true,
+                                                            -----------------------------------
+                                      ENABLE_THIRD_PARTY_AUTH to true (it is false by default). 
+                                     -----------------------------------------------------------
+
+
+2.In the lms.auth.json file, add the client secret. To do this, create the SOCIAL_AUTH_OAUTH_SECRETS key if the key does not already exist, and then add the appropriate value for your IdP.
+   
+
+       For Google, add the following value.
+      -------------------------------------
+
+          "SOCIAL_AUTH_OAUTH_SECRETS": { "google-oauth2":
+                                                           "abcdef123456789101112131" }
+
+       For Facebook, add the following value.
+       --------------------------------------
+
+           "SOCIAL_AUTH_OAUTH_SECRETS": {"facebook": "98765432181bbe3a2596efa8ba7abcde"}
+
+       For LinkedIn, add the following value.
+      ---------------------------------------
+
+           "SOCIAL_AUTH_OAUTH_SECRETS": { "linkedin-oauth2": "4D3Cb2aB1C0dEFGH" }
+
+
+       For Azure, add the following value.
+      -------------------------------------
+
+          "SOCIAL_AUTH_OAUTH_SECRETS": { "azuread-oauth2":
+                                         "abcdef12341yHlmOrR8D3vlV1cD2VtL7k9xk9DSB8vw=" }
+
+
+3. Restart the LMS server so that it will use the new settings.
+
+
+
+Add the Provider Configuration:
+================================
+
+1.Go to <LMS URI>/admin/third_party_auth/oauth2providerconfig/. 
+   For example, on devstack, go to http://localhost:8000/admin/third_party_auth/oauth2providerconfig/.
+   
+     id:edx  pswrd:edx (default)
+
+2.Select Add Provider Configuration (OAuth).
+
+3.Make sure that Enabled is selected.
+
+4.Make sure that Visible is selected.
+
+5.For Icon Class, enter the appropriate value.
+
+          For Google, enter fa-google-plus.
+          For Facebook, enter fa-facebook.
+          For LinkedIn, enter fa-linkedin.
+          For Azure, leave the field blank.
+       
+6.For Name, enter the appropriate value.
+
+          For Google, enter Google.
+          For Facebook, enter Facebook.
+          For LinkedIn, enter LinkedIn.
+          For Azure, enter Microsoft.
+          
+7.For Backend Name, select the appropriate value.
+
+         For Google, select google-oauth2.
+         For Facebook, select facebook.
+         For LinkedIn, select linkedin-oauth2.
+         For Azure, select azuread-oauth2.
+
+8.For Client ID, enter the client ID that you noted earlie
+
+9.For Client  Secret, enter the client  Secret that you noted earlie.
+
+10.(Optional) If you want Facebook or LinkedIn to provide the user’s email address during registration, enter the following code into Other settings.
+
+
+      For Facebook, use this code.
+
+         {
+             "SCOPE": ["email"],
+             "PROFILE_EXTRA_PARAMS": {
+               "fields": "id, name, email"
+            }
+         }
+
+
+
+      For LinkedIn, use this code.
+
+            { "SCOPE": ["r_basicprofile", "r_emailaddress"], "FIELD_SELECTORS":
+                                  ["email-address"] }
+
+11.Select Save.
+
+______________________________________________________________________________________________________
+________________________________________________________________________________________________________
+
+
+                            XBLOCK INSTALLATION:
+                            ====================
+                            ====================
+
+ Install XBlock Prerequisites:
+==============================
+
+To build an XBlock, you must have the following tools on your computer.
+
+     Python 2.7
+     Git
+     A Virtual Environment
+
+
+Create a Directory for XBlock Work:
+=====================================
+
+1. At the command prompt, run the following command to create the directory.
+
+$ mkdir xblock_development
+--------------------------
+
+2. Change directories to the xblock_development directory.
+
+$ cd xblock_development
+------------------------
+
+The rest of your work will be from this directory.
+
+
+
+Create and Activate the Virtual Environment:
+===========================================
+
+1. At the command prompt in xblock_development, run the following command to create the virtual environment.
+
+$ virtualenv venv
+------------------
+
+2. Run the following command to activate the virtual environment.
+
+$ source venv/bin/activate
+----------------------------
+
+
+3. When the virtual environment is activated, the command prompt shows the name of the virtual directory in parentheses.
+
+(venv) $
+---------
+
+
+Clone the XBlock Software Development Kit:
+==========================================
+
+1. In the xblock_development directory, run the following command to clone the XBlock SDK repository from GitHub.
+
+(venv) $ git clone https://github.com/edx/xblock-sdk.git
+--------------------------------------------------------
+
+2. Run the following command to change to the xblock-sdk directory.
+
+(venv) $ cd xblock-sdk
+----------------------
+
+
+3.Run the following command to install the XBlock SDK requirements.
+
+(venv) $ pip install -r requirements/base.txt
+---------------------------------------------
+
+4. Run the following command to return to the xblock_development directory, where you will perform the rest of your work.
+
+(venv) $ cd ..
+----------------
+
+
+Create an XBlock:
+==================
+
+1. Change to the xblock_development directory, which contains the venv and xblock-sdk subdirectories.
+
+2. Run the following command to create the skeleton files for the XBlock.
+
+(venv) $ xblock-sdk/bin/workbench-make-xblock
+----------------------------------------------
+
+Instructions in the command window instruct you to determine a short name and a class name. 
+
+3. At the command prompt, enter the Short Name you selected for your XBlock.
+
+$ Short name: myxblock
+----------------------
+
+4. At the command prompt, enter the Class name you selected for your XBlock.
+
+$ Class name: MyXBlock
+----------------------
+
+
+Install the XBlock:
+==================
+
+
+After you create the XBlock, you install it in the XBlock SDK.
+
+In the xblock_development directory, use pip to install your XBlock.
+
+(venv) $ pip install -e myxblock
+--------------------------------
+
+
+
+Create the SQLite Database:
+===========================
+
+1. In the xblock_development directory, run the following command to create the database and the tables.
+
+(venv) $ python xblock-sdk/manage.py migrate
+---------------------------------------------
+
+2. You are prompted to indicate whether or not to create a Django superuser.
+
+You just installed Django's auth system, which means you don't have any
+superusers defined. Would you like to create one now? (yes/no):
+
+3. Enter no.
+
+(venv) $ python no
+-------------------
+
+
+
+Run the XBlock SDK Server:
+==========================
+
+To see the web interface of the XBlock SDK, you must run the SDK server.
+
+In the xblock_development directory, run the following command to start the server.
+
+(venv) $ python xblock-sdk/manage.py runserver
+-----------------------------------------------
+
+
+Then test that the XBlock SDK is running. In a browser, go to http://localhost:8000. 
+-------------------------------------------------------------------------------------
+
+
+
+______________________________________________________________________________________________________
+____________________________________________________________________________________________________
+
+
+
 
 
 
